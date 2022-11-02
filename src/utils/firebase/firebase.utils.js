@@ -60,7 +60,8 @@ export const db = getFirestore(); // tell when wanna get a doc set or access, po
 
 export const addCollectionAndDocuments = async (
   collectionKey,
-  objectsToAdd
+  objectsToAdd,
+  field
 ) => {
   const collectionRef = collection(db, collectionKey);
   const batch = writeBatch(db);
@@ -69,6 +70,7 @@ export const addCollectionAndDocuments = async (
     const docRef = doc(collectionRef, object.title.toLowerCase());
     batch.set(docRef, object);
   });
+
   await batch.commit();
   console.log("done");
 };
@@ -77,8 +79,8 @@ export const getCategoriesAndDocuments = async () => {
   const collectionRef = collection(db, "categories");
   const q = query(collectionRef);
 
-  const querySnapShot = await getDocs(q); //async ability to fetch those doc snapshots
-  const categoryMap = querySnapShot.docs.reduce((acc, docSnapshot) => {
+  const querySnapshot = await getDocs(q); //async ability to fetch those doc snapshots
+  const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
     const { title, items } = docSnapshot.data();
     acc[title.toLowerCase()] = items;
     return acc;
@@ -140,8 +142,7 @@ export const signOutUser = async () => await signOut(auth);
 
 // whenever you instatiate this function you have to give me a callback
 //it's an open listener : the moment you set it ,this thing is always waiting to see whether or not auth states(signin/out) when it does it will auto callback a function
-export const onAuthStateChangedListener = (callback) => {
+export const onAuthStateChangedListener = (callback) =>
   onAuthStateChanged(auth, callback);
-};
 
 // main idea is just that these are the tools that google has determined to use faster in order to best actually store things inside a firestore
